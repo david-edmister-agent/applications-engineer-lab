@@ -1,5 +1,5 @@
 # applications-engineer-lab
-Interesting role at Underground Construction, Inc.
+Practice lab built while preparing for an Applications Engineer role — timecard-to-payroll integration with Databricks, data validation, and JDE staging.
 
 ## Purpose
 
