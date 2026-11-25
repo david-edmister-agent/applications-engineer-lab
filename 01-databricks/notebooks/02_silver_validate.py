@@ -74,6 +74,11 @@ save(cost_codes, "silver_cost_codes")
 
 # COMMAND ----------
 
+# Dedup runs on whole timecard RECORDS, before they are flattened into lines.
+#   _copy_rank:    numbers identical copies (same timecardId + revision) in landing order.
+#                  Copy 2+ is a resend of the same data -> EXACT_DUPLICATE.
+#   _max_revision: the highest revision seen for this timecardId. A foreman who edits an
+#                  approved card produces revision 2; revision 1 is then SUPERSEDED.
 w_copy = Window.partitionBy("timecardId", "revision").orderBy("_ingested_at", "_source_file")
 w_card = Window.partitionBy("timecardId")
 
@@ -89,8 +94,10 @@ records = (
     )
 )
 
+# Flatten to lines; dedup_status rides along so every line knows its record's fate.
 lines = explode_timecard_lines(records, passthrough=["dedup_status", "_source_file", "_ingested_at"])
 
+# Removed lines are kept (not deleted) so reconciliation can account for every bronze line.
 save(lines.where("dedup_status <> 'CURRENT'"), "silver_timecard_removed")
 current = lines.where("dedup_status = 'CURRENT'").drop("dedup_status")
 
@@ -103,11 +110,18 @@ current = lines.where("dedup_status = 'CURRENT'").drop("dedup_status")
 
 # COMMAND ----------
 
+# Existence checks use LEFT joins to master data: each lookup adds a True flag when the key
+# is found and leaves NULL when it isn't. NULL = the job / employee / job+cost-code pair is
+# not in master data.
 job_keys = jobs.select("job_code", F.lit(True).alias("_job_found"))
 emp_keys = employees.select("employee_id", F.lit(True).alias("_emp_found"))
 cc_keys = cost_codes.select("job_code", "cost_code", F.lit(True).alias("_cc_found"))
 w_day = Window.partitionBy("employee_id", "work_date")
 
+# employee_day_hours: total positive hours for this employee on this date across ALL jobs
+# (window over employee_id + work_date). It catches someone charged to two crews in one day.
+# dq_reasons: each F.when adds a reason when its rule fails; array_compact drops the NULLs,
+# so an empty array means the line passed every rule.
 checked = (
     current
     .join(job_keys, "job_code", "left")
