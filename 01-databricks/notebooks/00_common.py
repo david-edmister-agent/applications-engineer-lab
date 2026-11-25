@@ -52,10 +52,20 @@ TIMECARD_SCHEMA = """
             doubleTimeHours DOUBLE>>>>
 """
 
+# Pay type multipliers, applied to the employee's base hourly rate in gold:
+#   REG = straight time (1.0x), OT = time-and-a-half (1.5x), DT = double time (2.0x).
+# Which hours count as OT or DT is decided upstream (union agreement, state law —
+# California: daily OT after 8 hours, DT after 12). This lab trusts the hours as reported.
 PAY_TYPE_MULTIPLIER = {"REG": 1.0, "OT": 1.5, "DT": 2.0}
 
-# Illustrative JDE pay type (PDBA) codes. Replace them with the target system's pay type setup.
+# PDBA = Pay, Deduction, Benefit, Accrual. JDE identifies every pay type by a numeric PDBA
+# code that each company defines in its own payroll setup. 1/2/3 are placeholders; replace
+# them with the target system's codes.
 PDBA_CODE = {"REG": 1, "OT": 2, "DT": 3}
+
+# Last day of the weekly pay period. The pay cycle is configured in the payroll system;
+# change this one value to match it. Gold derives each line's batch from this.
+PAY_WEEK_END = "Sun"
 
 # Natural key of a payroll staging line
 GOLD_KEY = ["timecard_id", "employee_id", "work_date", "cost_code", "pay_type"]
@@ -69,7 +79,15 @@ DQ_REASONS = [
 def explode_timecard_lines(df: DataFrame, passthrough: list | None = None) -> DataFrame:
     """Flatten raw timecard records to lines (see the line definition above).
 
-    passthrough: extra columns from df to carry onto every line.
+    passthrough: extra columns from df to carry onto every line (silver uses this to carry
+    the record-level dedup_status down to each line).
+
+    One timecard record nests employees, and each employee nests cost codes, and each cost
+    code holds three hour buckets. Flattening:
+      explode(employees)  -> one row per employee on the timecard
+      explode(costCodes)  -> one row per employee x cost code
+      stack(3, ...)       -> one row per employee x cost code x pay type (REG/OT/DT)
+    Rows with 0 hours are dropped, so a cost code with only REG hours yields one line.
     """
     passthrough = passthrough or []
     emp = df.select("*", F.explode("employees").alias("_e"))

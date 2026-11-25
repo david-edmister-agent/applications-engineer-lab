@@ -65,6 +65,7 @@ python data/generator/generate.py --seed 42 --start-date 2026-11-02 --workdays 1
 - Workdays are Monday–Friday only. Ten workdays span two pay periods, ending Sun 2026-11-08 and Sun 2026-11-15.
 - The output directory is wiped and rewritten on every run.
 - Use Python 3.11+ and the standard library plus `faker`. Call `Faker.seed(seed)` and `random.Random(seed)`. Use no global `random`.
+- Write every generated file (CSV, NDJSON, JSON) with `newline="\n"` and `encoding="utf-8"`. For CSV, also pass `lineterminator="\n"` to `csv.writer` (its default is `\r\n`). The repo's `.gitattributes` sets `eol=lf`, so output must be byte-identical on Windows and Linux and match what git stores.
 
 ## 5. Data contracts
 
@@ -232,6 +233,7 @@ It **re-reads the files from disk**. It must not use the in-memory generation pl
    - **injection counts:** The count of `injections` per defect equals §6.2.
    - **baseline sanity:** For valid lines, every employee-day totals ≤ 10.0 hours.
    - **start date:** A non-Monday `--start-date` exits non-zero.
+   - **line endings:** No file under the output directory contains a `\r` byte.
 4. `data/output/` is committed and its contents match a fresh run.
 5. Nothing in the repo references Wente, `wentevineyards`, `BAROLO`, or any real company, utility, airport, or person. The single exception is the README's first line naming the hiring company. Generated data uses only the invented names in §5.
 
