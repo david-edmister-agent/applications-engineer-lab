@@ -1,0 +1,161 @@
+{
+  "seed": 42,
+  "line_definition": "timecard record x employee x cost code x pay type, hours != 0",
+  "expected": {
+    "bronze_lines": 2077,
+    "exact_duplicate_lines": 44,
+    "superseded_lines": 61,
+    "valid_lines": 1854,
+    "quarantine_lines": 118,
+    "quarantine_lines_by_reason": {
+      "MISSING_JOB": 30,
+      "UNKNOWN_JOB": 17,
+      "UNKNOWN_EMPLOYEE": 3,
+      "INVALID_COST_CODE": 4,
+      "NEGATIVE_HOURS": 2,
+      "OVER_24_HOURS": 10,
+      "NOT_APPROVED": 52
+    },
+    "valid_hours": "6011.50"
+  },
+  "injections": [
+    {
+      "defect": "OVER_24_HOURS",
+      "timecardId": "TC-000033",
+      "file": "timecards_20261104.json",
+      "detail": "E1032 (crew of 26-1004, TC-000028) also charged 14.0 REG + 4.0 OT to 26-1009 cost code 2500"
+    },
+    {
+      "defect": "OVER_24_HOURS",
+      "timecardId": "TC-000038",
+      "file": "timecards_20261105.json",
+      "detail": "E1061 (crew of 26-1010, TC-000046) also charged 14.0 REG + 4.0 OT to 26-1002 cost code 0200"
+    },
+    {
+      "defect": "SUPERSEDED",
+      "timecardId": "TC-000086",
+      "file": "timecards_20261113.json",
+      "detail": "revision 2 moves 1.0 REG for E1062 from 1200 to 1500; revision 1 in timecards_20261111.json"
+    },
+    {
+      "defect": "SUPERSEDED",
+      "timecardId": "TC-000090",
+      "file": "timecards_20261112.json",
+      "detail": "revision 2 moves 1.0 REG for E1036 from 2200 to 2300; revision 1 in timecards_20261111.json"
+    },
+    {
+      "defect": "SUPERSEDED",
+      "timecardId": "TC-000072",
+      "file": "timecards_20261113.json",
+      "detail": "revision 2 moves 1.0 REG for E1058 from 0200 to 4400; revision 1 in timecards_20261109.json"
+    },
+    {
+      "defect": "SUPERSEDED",
+      "timecardId": "TC-000070",
+      "file": "timecards_20261110.json",
+      "detail": "revision 2 moves 1.0 REG for E1013 from 0200 to 3100; revision 1 in timecards_20261109.json"
+    },
+    {
+      "defect": "EXACT_DUPLICATE",
+      "timecardId": "TC-000054",
+      "file": "timecards_20261109.json",
+      "detail": "identical copy of the record in timecards_20261106.json"
+    },
+    {
+      "defect": "EXACT_DUPLICATE",
+      "timecardId": "TC-000094",
+      "file": "timecards_20261112.json",
+      "detail": "identical copy of the record in timecards_20261111.json"
+    },
+    {
+      "defect": "EXACT_DUPLICATE",
+      "timecardId": "TC-000084",
+      "file": "timecards_20261111.json",
+      "detail": "identical copy of the record in timecards_20261110.json"
+    },
+    {
+      "defect": "MISSING_JOB",
+      "timecardId": "TC-000087",
+      "file": "timecards_20261111.json",
+      "detail": "jobCode blanked (was 26-1003)"
+    },
+    {
+      "defect": "MISSING_JOB",
+      "timecardId": "TC-000045",
+      "file": "timecards_20261105.json",
+      "detail": "jobCode blanked (was 26-1009)"
+    },
+    {
+      "defect": "UNKNOWN_JOB",
+      "timecardId": "TC-000073",
+      "file": "timecards_20261110.json",
+      "detail": "jobCode 26-1001 -> 99-9999"
+    },
+    {
+      "defect": "UNKNOWN_EMPLOYEE",
+      "timecardId": "TC-000056",
+      "file": "timecards_20261106.json",
+      "detail": "added E9001 with 8.0 REG on 2300"
+    },
+    {
+      "defect": "UNKNOWN_EMPLOYEE",
+      "timecardId": "TC-000092",
+      "file": "timecards_20261111.json",
+      "detail": "added E9002 with 8.0 REG on 2500"
+    },
+    {
+      "defect": "UNKNOWN_EMPLOYEE",
+      "timecardId": "TC-000114",
+      "file": "timecards_20261113.json",
+      "detail": "added E9003 with 8.0 REG on 2100"
+    },
+    {
+      "defect": "INVALID_COST_CODE",
+      "timecardId": "TC-000039",
+      "file": "timecards_20261105.json",
+      "detail": "E1031 cost code 1200 -> 2300 (not assigned to 26-1003)"
+    },
+    {
+      "defect": "INVALID_COST_CODE",
+      "timecardId": "TC-000066",
+      "file": "timecards_20261109.json",
+      "detail": "E1018 cost code 0200 -> 4200 (not assigned to 26-1006)"
+    },
+    {
+      "defect": "INVALID_COST_CODE",
+      "timecardId": "TC-000096",
+      "file": "timecards_20261111.json",
+      "detail": "E1080 cost code 4100 -> 2300 (not assigned to 26-1012)"
+    },
+    {
+      "defect": "NEGATIVE_HOURS",
+      "timecardId": "TC-000111",
+      "file": "timecards_20261113.json",
+      "detail": "E1064 cost code 1100 regularHours 5.0 -> -2.0"
+    },
+    {
+      "defect": "NEGATIVE_HOURS",
+      "timecardId": "TC-000026",
+      "file": "timecards_20261104.json",
+      "detail": "E1043 cost code 1400 regularHours 3.5 -> -2.0"
+    },
+    {
+      "defect": "NOT_APPROVED",
+      "timecardId": "TC-000108",
+      "file": "timecards_20261112.json",
+      "detail": "status Approved -> Pending"
+    },
+    {
+      "defect": "NOT_APPROVED",
+      "timecardId": "TC-000052",
+      "file": "timecards_20261106.json",
+      "detail": "status Approved -> Pending"
+    },
+    {
+      "defect": "NOT_APPROVED",
+      "timecardId": "TC-000109",
+      "file": "timecards_20261113.json",
+      "detail": "status Approved -> Pending"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+employee_id,address_number,first_name,last_name,ssn,craft,union_local,pay_rate,hire_date,status
+E1001,10001,Danielle,Johnson,981-15-0410,Foreman,Local 103,64.50,2015-01-03,A
+E1002,10002,Joshua,Walker,917-95-1680,Foreman,Local 105,62.89,2023-03-31,A
+E1003,10003,Jill,Rhodes,954-05-0489,Foreman,Local 101,64.23,2015-03-21,A
+E1004,10004,Patricia,Miller,964-78-0435,Foreman,Local 105,64.03,2026-01-22,A
+E1005,10005,Robert,Johnson,983-90-8929,Foreman,Local 104,64.25,2020-01-28,A
+E1006,10006,Jeffery,Wagner,975-36-0107,Foreman,Local 102,69.14,2019-06-25,A
+E1007,10007,Anthony,Gonzalez,943-36-2548,Foreman,Local 102,71.80,2017-07-20,A
+E1008,10008,Debra,Gardner,913-12-6225,Foreman,Local 101,65.67,2017-09-18,A
+E1009,10009,Jeffrey,Lawrence,977-34-0712,Foreman,Local 104,67.49,2012-10-19,A
+E1010,10010,Lisa,Smith,948-11-9045,Foreman,Local 103,70.49,2024-02-06,A
+E1011,10011,Linda,Wolfe,979-47-9460,Foreman,Local 102,69.21,2011-07-24,A
+E1012,10012,Matthew,Moore,905-85-3734,Foreman,Local 103,62.81,2015-03-23,A
+E1013,10013,Susan,Rogers,948-36-7429,Equipment Operator,Local 103,53.66,2018-04-21,A
+E1014,10014,Christopher,Davis,926-86-4375,Cable Splicer,Local 101,64.23,2024-03-29,A
+E1015,10015,Melanie,Munoz,968-94-4011,Pipefitter-Welder,Local 102,58.73,2018-07-06,A
+E1016,10016,Lindsay,Blair,981-89-9126,Cable Splicer,Local 102,65.01,2017-04-10,A
+E1017,10017,Amanda,Dudley,929-05-5169,Equipment Operator,Local 104,54.74,2011-06-27,A
+E1018,10018,Nicholas,Arnold,972-92-5156,Pipefitter-Welder,Local 102,60.71,2021-03-13,A
+E1019,10019,Maria,Montgomery,982-59-2341,Laborer,Local 103,37.42,2015-07-14,A
+E1020,10020,Michelle,Ray,968-34-9578,Teamster,Local 104,47.97,2018-12-16,A
+E1021,10021,Janet,Williams,928-18-8349,Cable Splicer,Local 104,58.93,2011-01-21,A
+E1022,10022,Jeremy,Roberts,919-81-2622,Equipment Operator,Local 104,58.10,2011-06-05,A
+E1023,10023,Christopher,Hall,948-77-7669,Laborer,Local 105,38.57,2022-05-30,A
+E1024,10024,Craig,Ramirez,987-93-1877,Equipment Operator,Local 105,59.68,2015-12-26,A
+E1025,10025,Cynthia,Diaz,914-38-7124,Cable Splicer,Local 102,62.64,2010-01-27,A
+E1026,10026,Mitchell,Clark,964-98-2928,Cable Splicer,Local 105,59.08,2024-01-10,A
+E1027,10027,Joseph,Zuniga,981-65-9978,Cable Splicer,Local 102,59.56,2018-05-22,A
+E1028,10028,Deborah,Lynch,969-68-0010,Pipefitter-Welder,Local 105,57.31,2020-12-16,A
+E1029,10029,George,Daniel,914-47-5039,Equipment Operator,Local 102,52.59,2015-05-28,A
+E1030,10030,Frank,Gray,910-11-7963,Teamster,Local 101,47.45,2012-10-27,A
+E1031,10031,Veronica,Bowman,984-61-9008,Pipefitter-Welder,Local 102,56.71,2021-11-01,A
+E1032,10032,Angela,Cohen,954-28-8836,Teamster,Local 102,45.19,2018-12-13,A
+E1033,10033,Megan,Parsons,956-67-7398,Cable Splicer,Local 101,60.53,2015-01-15,A
+E1034,10034,Jeremy,Johnson,943-03-9639,Equipment Operator,Local 105,54.35,2023-03-14,A
+E1035,10035,Leslie,Adams,900-10-0965,Pipefitter-Welder,Local 102,54.69,2010-09-15,A
+E1036,10036,Jason,Hahn,909-66-3900,Cable Splicer,Local 103,64.85,2020-11-20,A
+E1037,10037,Nancy,Edwards,969-17-9356,Pipefitter-Welder,Local 105,58.84,2015-06-14,A
+E1038,10038,Diana,Foster,952-25-1546,Laborer,Local 101,42.74,2019-09-02,A
+E1039,10039,Robin,Ellis,954-53-7652,Cable Splicer,Local 101,64.89,2024-08-28,A
+E1040,10040,Joseph,Wright,907-52-5560,Equipment Operator,Local 101,54.54,2014-04-19,A
+E1041,10041,Anna,Baker,968-58-2297,Pipefitter-Welder,Local 104,55.87,2016-03-31,A
+E1042,10042,Brenda,Hurst,931-10-7261,Laborer,Local 105,37.00,2011-02-19,A
+E1043,10043,Reginald,Robinson,901-12-3873,Teamster,Local 102,46.16,2020-11-22,A
+E1044,10044,Whitney,Hicks,927-52-0961,Laborer,Local 102,39.88,2010-01-18,A
+E1045,10045,Christopher,Williams,933-59-4674,Laborer,Local 104,43.13,2026-05-21,A
+E1046,10046,Daniel,Burton,984-92-7974,Teamster,Local 102,43.94,2016-08-27,A
+E1047,10047,Laura,Henderson,907-75-8884,Pipefitter-Welder,Local 101,61.65,2017-01-13,A
+E1048,10048,Bryan,James,906-75-7812,Equipment Operator,Local 105,57.43,2013-07-13,A
+E1049,10049,Wendy,Rice,965-11-3045,Equipment Operator,Local 101,58.09,2011-07-11,A
+E1050,10050,Tasha,Valencia,951-16-9334,Pipefitter-Welder,Local 102,59.92,2023-05-03,A
+E1051,10051,Alexander,Le,979-11-6869,Equipment Operator,Local 105,57.78,2021-09-22,A
+E1052,10052,Erin,Herrera,933-27-5148,Cable Splicer,Local 102,60.71,2018-11-17,A
+E1053,10053,Joseph,Davidson,985-83-4916,Pipefitter-Welder,Local 104,57.23,2011-08-18,A
+E1054,10054,Daniel,Graham,958-80-9225,Equipment Operator,Local 101,52.75,2022-01-22,A
+E1055,10055,Shawn,Mckay,964-34-2171,Pipefitter-Welder,Local 103,54.70,2015-06-25,A
+E1056,10056,Nancy,Baker,936-21-7180,Cable Splicer,Local 105,65.20,2016-10-14,A
+E1057,10057,Vincent,White,983-68-0129,Teamster,Local 105,45.06,2024-11-17,A
+E1058,10058,Rita,Harrell,917-34-1892,Equipment Operator,Local 101,59.60,2022-05-30,A
+E1059,10059,Kenneth,Fowler,934-37-9910,Pipefitter-Welder,Local 102,61.34,2017-09-09,A
+E1060,10060,Chelsea,Hernandez,987-82-4326,Pipefitter-Welder,Local 105,59.00,2015-08-20,A
+E1061,10061,Kathryn,Ryan,911-82-6940,Equipment Operator,Local 103,52.45,2010-01-30,A
+E1062,10062,Kimberly,Moreno,998-17-4292,Cable Splicer,Local 102,65.59,2019-11-29,A
+E1063,10063,Aaron,Nguyen,990-55-9190,Teamster,Local 101,43.14,2011-09-09,A
+E1064,10064,Andrew,Hickman,969-05-6050,Pipefitter-Welder,Local 105,59.65,2013-04-28,A
+E1065,10065,Natasha,Decker,916-06-5051,Laborer,Local 103,36.40,2018-01-10,A
+E1066,10066,Kyle,Brown,987-32-1685,Pipefitter-Welder,Local 103,61.98,2022-07-23,A
+E1067,10067,Natalie,Arroyo,979-96-2533,Laborer,Local 102,37.66,2013-12-21,A
+E1068,10068,Christopher,Tucker,903-23-5443,Laborer,Local 104,42.85,2026-06-27,A
+E1069,10069,Chad,Hodges,934-21-1772,Pipefitter-Welder,Local 104,54.39,2020-07-22,A
+E1070,10070,Katie,Anderson,925-59-5729,Pipefitter-Welder,Local 103,56.33,2015-01-01,A
+E1071,10071,Thomas,Pierce,984-25-6529,Equipment Operator,Local 103,54.85,2011-07-23,A
+E1072,10072,Joseph,Brennan,944-83-8347,Cable Splicer,Local 104,64.95,2022-01-10,A
+E1073,10073,Rodney,Lewis,903-15-4280,Cable Splicer,Local 102,63.94,2015-12-15,A
+E1074,10074,Amber,Blair,913-77-7120,Equipment Operator,Local 103,59.46,2017-01-13,A
+E1075,10075,James,Collins,977-66-1895,Laborer,Local 104,41.90,2014-04-07,A
+E1076,10076,Wanda,Santos,905-91-7145,Cable Splicer,Local 101,63.32,2022-01-28,A
+E1077,10077,Samuel,Holmes,946-56-1147,Pipefitter-Welder,Local 103,60.38,2017-01-15,A
+E1078,10078,David,Walker,992-39-8309,Equipment Operator,Local 103,58.82,2019-02-28,A
+E1079,10079,Matthew,Chapman,951-90-4845,Cable Splicer,Local 105,59.30,2014-04-21,A
+E1080,10080,Jerry,Robinson,985-49-2852,Laborer,Local 105,41.82,2016-10-01,A

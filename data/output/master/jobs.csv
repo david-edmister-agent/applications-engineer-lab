@@ -1,0 +1,13 @@
+job_code,job_type,client,job_description,business_unit,status
+26-1001,Gas Distribution,Ridgeline Gas & Electric,Elm St 4in PE Main Replacement,2610010,Active
+26-1002,Gas Distribution,Ridgeline Gas & Electric,Oak Ave Gas Service Renewals,2610020,Active
+26-1003,Gas Distribution,Ridgeline Gas & Electric,Birch Ln 2in PE Main Extension,2610030,Active
+26-1004,Gas Distribution,Ridgeline Gas & Electric,Willow Ct Steel Main Abandonment,2610040,Active
+26-1005,Gas Distribution,Ridgeline Gas & Electric,Maple Dr Service Line Tie-Ins,2610050,Active
+26-1006,Electric Underground,Ridgeline Gas & Electric,Cedar Blvd Underground Conversion,2610060,Active
+26-1007,Electric Underground,Ridgeline Gas & Electric,Aspen Way Conduit and Vault Install,2610070,Active
+26-1008,Electric Underground,Ridgeline Gas & Electric,Juniper Rd Feeder Cable Replacement,2610080,Active
+26-1009,Electric Underground,Ridgeline Gas & Electric,Sycamore St Duct Bank Extension,2610090,Active
+26-1010,Airport Fueling,Valley Regional Airport,Terminal B Fuel Hydrant Extension,2610100,Active
+26-1011,Telecom,Harborview Fiber,Mill Rd Fiber Backbone,2610110,Active
+26-1012,Telecom,Harborview Fiber,Poplar Ave Micro-Trench Fiber Laterals,2610120,Active
