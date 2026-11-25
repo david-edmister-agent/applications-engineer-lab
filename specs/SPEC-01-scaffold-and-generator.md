@@ -12,6 +12,8 @@ Produce deterministic, synthetic HeavyJob-style field timecard data (plus employ
 
 The data contains **seeded defects** so that silver validation and quarantine logic have something real to catch.
 
+**Business scenario (fictional):** A Northern California utility contractor runs field crews on gas distribution, electric underground, airport fueling, and telecom work for its utility, airport, and fiber clients. Foremen log daily crew time in HCSS HeavyJob against the job's cost codes. Approved time flows through staging into JD Edwards payroll. Every company, client, project, and person in the data is invented.
+
 ## 2. Scope
 
 **In scope**
@@ -74,9 +76,9 @@ python data/generator/generate.py --seed 42 --start-date 2026-11-02 --workdays 1
 | address_number | int, `10001` … `10080` (JDE AN8 stand-in) |
 | first_name, last_name | Faker |
 | ssn | `9XX-XX-XXXX`. The area number must be **900–999**, which is never issued, so these values are guaranteed fake. |
-| craft | Foreman (12), Operator, Laborer, Carpenter, Teamster |
-| union_local | `Local 101` … `Local 105` |
-| pay_rate | 2 decimals. Foreman 58–66, Operator 48–56, Carpenter 44–52, Teamster 40–46, Laborer 34–40 |
+| craft | Foreman (12), Equipment Operator, Pipefitter-Welder, Cable Splicer, Laborer, Teamster |
+| union_local | `Local 101` … `Local 105` (fictional) |
+| pay_rate | 2 decimals, illustrative only. Foreman 62–72, Cable Splicer 58–66, Pipefitter-Welder 54–62, Equipment Operator 52–60, Teamster 42–48, Laborer 36–44 |
 | hire_date | ISO date, 2010-01-01 … 2026-06-30 |
 | status | `A` |
 
@@ -85,15 +87,27 @@ python data/generator/generate.py --seed 42 --start-date 2026-11-02 --workdays 1
 | column | rule |
 |---|---|
 | job_code | `26-1001` … `26-1012` |
-| job_description | e.g. "Hwy 84 Culvert Replacement" (invented; no real projects) |
+| job_type | `26-1001`–`26-1005` Gas Distribution · `26-1006`–`26-1009` Electric Underground · `26-1010` Airport Fueling · `26-1011`–`26-1012` Telecom |
+| client | Invented: Gas Distribution and Electric Underground → `Ridgeline Gas & Electric`; Airport Fueling → `Valley Regional Airport`; Telecom → `Harborview Fiber` |
+| job_description | Invented, matching job_type, e.g. "Elm St 4in PE Main Replacement", "Oak Ave Gas Service Renewals", "Cedar Blvd Underground Conversion", "Terminal B Fuel Hydrant Extension", "Mill Rd Fiber Backbone". No real streets-plus-city combinations or real projects. |
 | business_unit | 7-digit string: `26` + 4-digit job number + `0`, e.g. `2610010` |
 | status | `Active` |
 
+Column order: job_code, job_type, client, job_description, business_unit, status.
+
 ### 5.3 `master/cost_codes.csv`
 
-Shared catalog (cost_code, description, unit_of_measure):
-`1000 Mobilization LS`, `2100 Excavation CY`, `2200 Backfill CY`, `2300 Grading SY`, `3100 Concrete Forming SF`, `3200 Concrete Placement CY`, `4100 Pipe Install LF`, `5100 Paving TN`, `6100 Traffic Control DAY`, `9000 Cleanup LS`.
-Each job gets a seeded subset of 6–8 codes, written as one row per (job_code, cost_code). `cost_code` is a 4-character **string**.
+Catalog (cost_code, description, unit_of_measure). `cost_code` is a 4-character **string**.
+
+| Pool | Codes |
+|---|---|
+| Common | `0100 Mobilization LS`, `0200 Traffic Control DAY`, `0300 USA Locate & Pothole EA`, `9000 Restoration & Cleanup LS` |
+| Gas Distribution | `1100 Trenching LF`, `1200 Directional Bore LF`, `1300 PE Main Install LF`, `1400 Service Renewal EA`, `1500 Tie-In & Pressure Test EA`, `1600 Main Abandonment LF` |
+| Electric Underground | `2100 Trenching LF`, `2200 Conduit Install LF`, `2300 Vault & Splice Box Set EA`, `2400 Cable Pull LF`, `2500 Paving Restoration TN` |
+| Airport Fueling | `3100 Excavation CY`, `3200 Fuel Pipe Weld LF`, `3300 Hydrant Pit Install EA`, `3400 Hydrostatic Test EA` |
+| Telecom | `4100 Micro-Trench LF`, `4200 Conduit Bore LF`, `4300 Handhole Set EA`, `4400 Fiber Splice EA` |
+
+Each job is assigned **every code in its job_type pool plus `0200` and `9000`** (Gas 8, Electric 7, Airport 6, Telecom 6). This is deterministic, with no random subset. Write one row per (job_code, cost_code), with columns job_code, cost_code, description, unit_of_measure. Codes `0100`, `0300`, and other types' pools are valid catalog codes that are *not* assigned to a given job, which gives INVALID_COST_CODE realistic targets.
 
 ### 5.4 `timecards/timecards_YYYYMMDD.json` — NDJSON, one timecard per line
 
@@ -101,8 +115,8 @@ Each job gets a seeded subset of 6–8 codes, written as one row per (job_code, 
 {"timecardId":"TC-000001","revision":1,"jobCode":"26-1001","foremanId":"E1001",
  "date":"2026-11-02","status":"Approved","lastModified":"2026-11-02T17:30:00Z",
  "employees":[{"employeeId":"E1013","costCodes":[
-   {"costCode":"2100","regularHours":6.0,"overtimeHours":1.0,"doubleTimeHours":0.0},
-   {"costCode":"2200","regularHours":2.0,"overtimeHours":0.0,"doubleTimeHours":0.0}]}]}
+   {"costCode":"1100","regularHours":6.0,"overtimeHours":1.0,"doubleTimeHours":0.0},
+   {"costCode":"1300","regularHours":2.0,"overtimeHours":0.0,"doubleTimeHours":0.0}]}]}
 ```
 
 The baseline (before defects) follows these rules:
@@ -185,7 +199,8 @@ It **re-reads the files from disk**. It must not use the in-memory generation pl
 
 ## 7. README.md content
 
-1. One-paragraph purpose: a practice lab for an Applications Engineer role (integrations, data validation, payroll staging), built on synthetic data only.
+0. Keep the existing first line, "Interesting role at Underground Construction, Inc.", at the top of the file.
+1. One-paragraph purpose: a practice lab for an Applications Engineer role (integrations, data validation, payroll staging) at a utility contractor, modeled on the fictional scenario in §1 and built on synthetic data only.
 2. **Synthetic-data notice:** All names, jobs, and SSNs are generated. SSNs use the never-issued 900–999 area range. Silver masks SSN to the last 4 digits, and gold carries no SSN.
 3. Architecture sketch in text: generator → Volume → bronze → silver (+ quarantine) → gold → JDE timecard staging view → (planned) Power Automate.
 4. **Role-mapping table:**
@@ -218,7 +233,7 @@ It **re-reads the files from disk**. It must not use the in-memory generation pl
    - **baseline sanity:** For valid lines, every employee-day totals ≤ 10.0 hours.
    - **start date:** A non-Monday `--start-date` exits non-zero.
 4. `data/output/` is committed and its contents match a fresh run.
-5. Nothing in the repo references Wente, `wentevineyards`, `BAROLO`, or any real company or person.
+5. Nothing in the repo references Wente, `wentevineyards`, `BAROLO`, or any real company, utility, airport, or person. The single exception is the README's first line naming the hiring company. Generated data uses only the invented names in §5.
 
 ## 9. Loop instructions and stop conditions
 
