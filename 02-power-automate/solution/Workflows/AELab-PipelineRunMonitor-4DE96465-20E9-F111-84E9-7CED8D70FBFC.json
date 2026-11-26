@@ -1,0 +1,372 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_5ff0c"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_approvals": {
+        "api": {
+          "name": "shared_approvals"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedapprovals_6fa90"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_office365": {
+        "api": {
+          "name": "shared_office365"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedoffice365_35017"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "DatabricksHost (aelab_DatabricksHost)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "aelab_DatabricksHost"
+          }
+        },
+        "DatabricksWarehouseId (aelab_DatabricksWarehouseId)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "aelab_DatabricksWarehouseId"
+          }
+        },
+        "DatabricksToken (aelab_DatabricksToken)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "aelab_DatabricksToken"
+          }
+        },
+        "SupervisorEmail (aelab_SupervisorEmail)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "aelab_SupervisorEmail"
+          }
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "type": "Recurrence",
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "startTime": "2026-11-25T18:00:00Z"
+          },
+          "metadata": {
+            "operationMetadataId": ""
+          }
+        }
+      },
+      "actions": {
+        "Try": {
+          "type": "Scope",
+          "actions": {
+            "Query_run_log": {
+              "type": "Http",
+              "inputs": {
+                "uri": "@{concat('https://', replace(replace(trim(variables('HostClean')), 'https://', ''), '/', ''), '/api/2.0/sql/statements')}",
+                "method": "POST",
+                "headers": {
+                  "Authorization": "Bearer @{parameters('DatabricksToken (aelab_DatabricksToken)')}",
+                  "Content-Type": "application/json"
+                },
+                "body": {
+                  "warehouse_id": "@{parameters('DatabricksWarehouseId (aelab_DatabricksWarehouseId)')}",
+                  "statement": "SELECT run_id, run_at, status, valid_lines, quarantine_lines, quarantine_by_reason FROM workspace.ae_lab.ops_run_log ORDER BY run_at DESC LIMIT 1",
+                  "wait_timeout": "50s",
+                  "format": "JSON_ARRAY",
+                  "disposition": "INLINE"
+                },
+                "retryPolicy": {
+                  "type": "exponential",
+                  "count": 4,
+                  "interval": "PT10S"
+                }
+              },
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs"
+                  ]
+                }
+              },
+              "metadata": {
+                "operationMetadataId": ""
+              }
+            },
+            "Run_row": {
+              "type": "Compose",
+              "inputs": "@body('Query_run_log')?['result']?['data_array']?[0]",
+              "runAfter": {
+                "Query_run_log": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Log_run": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "",
+                  "table": "17100a39-83de-47d0-b022-db2af21a9885",
+                  "item/Title": "@outputs('Run_row')?[0]",
+                  "item/RunAt": "@outputs('Run_row')?[1]",
+                  "item/Status/Value": "@outputs('Run_row')?[2]",
+                  "item/ValidLines": "@int(outputs('Run_row')?[3])",
+                  "item/QuarantineLines": "@int(outputs('Run_row')?[4])",
+                  "item/QuarantineByReason": "@outputs('Run_row')?[5]",
+                  "item/ApprovalOutcome/Value": "@if(greater(int(outputs('Run_row')?[4]), 0), 'Pending', 'Not required')"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "PostItem",
+                  "connectionName": "shared_sharepointonline"
+                }
+              },
+              "runAfter": {
+                "Run_row": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Has_quarantine": {
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "greater": [
+                      "@int(outputs('Run_row')?[4])",
+                      0
+                    ]
+                  }
+                ]
+              },
+              "actions": {
+                "Supervisor_Approval": {
+                  "type": "OpenApiConnectionWebhook",
+                  "inputs": {
+                    "parameters": {
+                      "approvalType": "Basic",
+                      "WebhookApprovalCreationInput/title": "@concat('Timecard quarantine review: ', outputs('Run_row')?[4], ' lines')",
+                      "WebhookApprovalCreationInput/assignedTo": "@parameters('SupervisorEmail (aelab_SupervisorEmail)')",
+                      "WebhookApprovalCreationInput/details": "@concat('Run ', outputs('Run_row')?[0], ' quarantined ', outputs('Run_row')?[4], ' timecard lines. Reasons: ', outputs('Run_row')?[5], '. Approve to release the quarantine list to payroll for correction; Reject to hold it.')",
+                      "WebhookApprovalCreationInput/itemLink": "@body('Log_run')?['{Link}']",
+                      "WebhookApprovalCreationInput/itemLinkDescription": "Pipeline Run Log entry",
+                      "WebhookApprovalCreationInput/enableNotifications": true,
+                      "WebhookApprovalCreationInput/enableReassignment": true
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_approvals",
+                      "operationId": "StartAndWaitForAnApproval",
+                      "connectionName": "shared_approvals"
+                    }
+                  }
+                },
+                "Record_decision": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "",
+                      "table": "17100a39-83de-47d0-b022-db2af21a9885",
+                      "id": "@body('Log_run')?['ID']",
+                      "item/Title": "@outputs('Run_row')?[0]",
+                      "item/ApprovalOutcome/Value": "@if(equals(outputs('Supervisor_approval')?['body/outcome'], 'Approve'), 'Approved', 'Rejected')",
+                      "item/Approver": "@first(outputs('Supervisor_approval')?['body/responses'])?['responder']?['displayName']",
+                      "item/ApproverComments": "@first(outputs('Supervisor_approval')?['body/responses'])?['comments']"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {
+                    "Supervisor_Approval": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "else": {
+                "actions": {}
+              },
+              "runAfter": {
+                "Run_failed": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Run_failed": {
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@outputs('Run_row')?[2]",
+                      "FAIL"
+                    ]
+                  }
+                ]
+              },
+              "actions": {
+                "Alert_FAIL_run": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "emailMessage/To": "",
+                      "emailMessage/Subject": "@concat('AE Lab pipeline FAIL: run ', outputs('Run_row')?[0])",
+                      "emailMessage/Body": "<p class=\"editor-paragraph\">@{concat('Databricks reconciliation reported FAIL at ', outputs('Run_row')?[1], '. Payroll staging should not be released until the run is investigated. Log entry: ', body('Log_run')?['{Link}'])}</p>",
+                      "emailMessage/Importance": "Normal"
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                      "operationId": "SendEmailV2",
+                      "connectionName": "shared_office365"
+                    }
+                  }
+                }
+              },
+              "else": {
+                "actions": {}
+              },
+              "runAfter": {
+                "Log_run": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": ""
+          }
+        },
+        "Initialize_variable": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "HostClean",
+                "type": "string",
+                "value": "@parameters('DatabricksHost (aelab_DatabricksHost)')"
+              }
+            ]
+          },
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": ""
+          }
+        },
+        "Catch": {
+          "type": "Scope",
+          "actions": {
+            "Failed_actions": {
+              "type": "Query",
+              "inputs": {
+                "from": "@result('Try')",
+                "where": "@equals(item()?['status'],'Failed')"
+              }
+            },
+            "Log_failure": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "",
+                  "table": "6d125259-2aef-4b4c-bb31-e6eb6049e463",
+                  "item/Title": "@workflow()?['run']?['name']",
+                  "item/FailedAt": "@utcNow()",
+                  "item/FailedAction": "@first(body('Failed_actions'))?['name']",
+                  "item/ErrorMessage": "@string(coalesce(first(body('Failed_actions'))?['error'], first(body('Failed_actions'))?['outputs']?['body']))",
+                  "item/RunURL": "@concat('https://make.powerautomate.com/environments/', workflow()?['tags']?['environmentName'], '/flows/', workflow()?['name'], '/runs/', workflow()?['run']?['name'])"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "PostItem",
+                  "connectionName": "shared_sharepointonline"
+                }
+              },
+              "runAfter": {
+                "Failed_actions": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Alert_flow_failure": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "emailMessage/To": "",
+                  "emailMessage/Subject": "@concat('AE Lab flow failed at ', first(body('Failed_actions'))?['name'])",
+                  "emailMessage/Body": "<p class=\"editor-paragraph\">@{concat('Error: ', string(coalesce(first(body('Failed_actions'))?['error'], first(body('Failed_actions'))?['outputs']?['body'])), ' Run: ', outputs('Log_failure')?['body/RunUrl'])}</p>",
+                  "emailMessage/Importance": "Normal"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                  "operationId": "SendEmailV2",
+                  "connectionName": "shared_office365"
+                }
+              },
+              "runAfter": {
+                "Log_failure": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Terminate": {
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Failed",
+                "runError": {
+                  "message": "Handled failure; see Flow Failure Log"
+                }
+              },
+              "runAfter": {
+                "Alert_flow_failure": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Try": [
+              "FAILED",
+              "TIMEDOUT"
+            ]
+          }
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}
