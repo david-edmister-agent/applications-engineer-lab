@@ -35,6 +35,64 @@ vw_f06116z1_export  (JDE timecard staging view)
 
 `04_reconciliation` checks every layer against the generator's `manifest.json` and logs each run to `ops_run_log`.
 
+
+```mermaid
+flowchart TB
+    subgraph LOCAL["馃捇 Local PC + GitHub"]
+        GEN["Data generator (Python)<br/>synthetic timecards + manifest"]
+        GH["GitHub repo<br/>specs 路 notebooks 路 flow solution"]
+    end
+
+    subgraph DBX["馃П Databricks"]
+        VOL["Volume: landing<br/>master/ 路 timecards/ 路 manifest/"]
+        BRZ["01 Bronze<br/>Auto Loader + COPY INTO"]
+        SLV["02 Silver<br/>dedup 路 validate 路 mask SSN"]
+        QUA["Quarantine<br/>7 reason codes"]
+        GLD["03 Gold<br/>payroll stage 路 idempotent MERGE"]
+        JDE["JDE export view<br/>F06116Z1 shape"]
+        REC["04 Reconciliation<br/>20 checks 鈫?ops_run_log"]
+    end
+
+    subgraph M365["鈽侊笍 Microsoft 365 / Power Platform"]
+        FLOW["Power Automate<br/>Pipeline Run Monitor (Try / Catch)"]
+        SPL["SharePoint<br/>Pipeline Run Log"]
+        SUP["Field supervisor<br/>approve / reject"]
+        ALR["Alert email<br/>FAIL run or flow error"]
+        FFL["SharePoint<br/>Flow Failure Log"]
+    end
+
+    GEN -- "upload files" --> VOL
+    GH -- "Git folder" --> BRZ
+    VOL --> BRZ --> SLV --> GLD --> JDE
+    SLV --> QUA
+    GLD --> REC
+    QUA --> REC
+    REC -- "SQL Statement API" --> FLOW
+    FLOW -- "log run" --> SPL
+    FLOW -- "quarantine > 0" --> SUP
+    SUP -- "decision" --> SPL
+    FLOW -- "FAIL run" --> ALR
+    FLOW -. "Catch: on failure" .-> FFL
+    FFL -.-> ALR
+    JDE -. "future: Boomi / insert job" .-> ZT[("JDE Z table")]
+
+    classDef local fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+    classDef dbx fill:#EEEDFE,stroke:#534AB7,color:#26215C
+    classDef m365 fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+    classDef warn fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
+    classDef future fill:#FFFFFF,stroke:#888780,color:#444441,stroke-dasharray: 4 4
+    class GEN,GH local
+    class VOL,BRZ,SLV,GLD,JDE,REC dbx
+    class QUA warn
+    class FLOW,SPL,SUP m365
+    class ALR,FFL warn
+    class ZT future
+    style LOCAL fill:transparent,stroke:#888780,stroke-dasharray: 5 5
+    style DBX fill:transparent,stroke:#534AB7,stroke-dasharray: 5 5
+    style M365 fill:transparent,stroke:#0F6E56,stroke-dasharray: 5 5
+```
+
+
 ## Role mapping
 
 | Lab component | Skill demonstrated | Status |
