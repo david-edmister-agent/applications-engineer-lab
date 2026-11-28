@@ -35,25 +35,24 @@ vw_f06116z1_export  (JDE timecard staging view)
 
 `04_reconciliation` checks every layer against the generator's `manifest.json` and logs each run to `ops_run_log`.
 
-
 ```mermaid
 flowchart TB
-    subgraph LOCAL["馃捇 Local PC + GitHub"]
+    subgraph LOCAL["Local PC + GitHub"]
         GEN["Data generator (Python)<br/>synthetic timecards + manifest"]
-        GH["GitHub repo<br/>specs 路 notebooks 路 flow solution"]
+        GH["GitHub repo<br/>specs, notebooks, flow solution"]
     end
 
-    subgraph DBX["馃П Databricks"]
-        VOL["Volume: landing<br/>master/ 路 timecards/ 路 manifest/"]
+    subgraph DBX["Databricks"]
+        VOL["Volume: landing<br/>master/, timecards/, manifest/"]
         BRZ["01 Bronze<br/>Auto Loader + COPY INTO"]
-        SLV["02 Silver<br/>dedup 路 validate 路 mask SSN"]
+        SLV["02 Silver<br/>dedup, validate, mask SSN"]
         QUA["Quarantine<br/>7 reason codes"]
-        GLD["03 Gold<br/>payroll stage 路 idempotent MERGE"]
+        GLD["03 Gold<br/>payroll stage, idempotent MERGE"]
         JDE["JDE export view<br/>F06116Z1 shape"]
-        REC["04 Reconciliation<br/>20 checks 鈫?ops_run_log"]
+        REC["04 Reconciliation<br/>20 checks -> ops_run_log"]
     end
 
-    subgraph M365["鈽侊笍 Microsoft 365 / Power Platform"]
+    subgraph M365["Microsoft 365 / Power Platform"]
         FLOW["Power Automate<br/>Pipeline Run Monitor (Try / Catch)"]
         SPL["SharePoint<br/>Pipeline Run Log"]
         SUP["Field supervisor<br/>approve / reject"]
@@ -69,7 +68,7 @@ flowchart TB
     QUA --> REC
     REC -- "SQL Statement API" --> FLOW
     FLOW -- "log run" --> SPL
-    FLOW -- "quarantine > 0" --> SUP
+    FLOW -- "quarantine &gt; 0" --> SUP
     SUP -- "decision" --> SPL
     FLOW -- "FAIL run" --> ALR
     FLOW -. "Catch: on failure" .-> FFL
@@ -91,7 +90,6 @@ flowchart TB
     style DBX fill:transparent,stroke:#534AB7,stroke-dasharray: 5 5
     style M365 fill:transparent,stroke:#0F6E56,stroke-dasharray: 5 5
 ```
-
 
 ## Role mapping
 
